@@ -14,9 +14,9 @@
     <section>
         <form id="myForm">
             <label for="phone">phone</label>
-            <input type="text" id="phone" name="phone" placeholder="phone" >
+            <input type="text" class="form-phone" id="phone" name="phone" placeholder="phone" >
             <label for="email">email</label>
-            <input type="text" id="email" name="email" placeholder="email" >
+            <input type="text" class="form-email" id="email" name="email" placeholder="email" >
             <br>
             <button type="submit">submit</button>
             <button type="reset">reset</button>
@@ -25,26 +25,27 @@
     <script src="validator.js"></script>
 
     <script>
-        const valid = new Validator({
-            selector: '#myForm',
-            pattern: {
-                // phone: /^\+380\d{7}$/,
-                zip: /\d{5,6}/
-            },
-            method: {
-                'phone': [
+       const valid = new Validator({
+          selector: 'form',
+          pattern: {
+           
+          },
+          method: {
+                'form-name': [
+                    ['notEmpty'],
+                    ['pattern', 'name']
+                ],
+                'form-phone': [
                     ['notEmpty'],
                     ['pattern', 'phone']
                 ],
-                'email': [
+                'form-email': [
                     ['notEmpty'],
                     ['pattern', 'email']
                 ]
-
             }
-        });
-
-        valid.init();
+      });
+      valid.init();
     </script>
 </body>
 </html>

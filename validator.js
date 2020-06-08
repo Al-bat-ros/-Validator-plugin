@@ -1,36 +1,23 @@
 class Validator {
     constructor({selector, pattern = {}, method}){
-        this.form = document.querySelector(selector);//
+        this.form = document.querySelectorAll(selector);//
         this.pattern = pattern;// кастомные шаблоны
         this.method = method;// настройки
-        this.elementsForm = [...this.form.elements].filter(item => {
-            return item.tagName.toLowerCase() !== 'button' &&
-            item.type !== 'button';
+        this.arrElement = [];
+        this.form.forEach(item => {  
+            this.arrElement.push(item);
         });
         this.error = new Set();
     }
+
     init(){
-        console.log(this.form);
         this.applyStyle();
         this.setPattern();
-        console.log(this.elementsForm);
-        this.elementsForm.forEach(elem => elem.addEventListener('change', this.chekIt.bind(this)));
-
-        this.form.addEventListener('submit', e => {
-            console.log(e);
-            e.preventDefault();
-            
-            this.elementsForm.forEach(elem => this.chekIt({target: elem}));
-           
-            if(this.error.size){
-                e.preventDefault();
-            }
-        })
+        this.arrElement.forEach(elem => elem.addEventListener('change', this.chekIt.bind(this)));
     }
 
     //здесь проходит волидация
     isValid(elem){
-       
         const validatorMethod = {
             notEmpty(elem){
                 if(elem.value.trim() === ''){
@@ -39,13 +26,12 @@ class Validator {
                 return true;
             },
             pattern(elem, pattern){
-                
                 return pattern.test(elem.value);
             }
         };
-        if(this.method){
-            const method = this.method[elem.id];
 
+        if(this.method){
+            const method = this.method[elem.classList[0]];      
             if(method){
                return method.every( item => validatorMethod[item[0]](elem, this.pattern[item[1]]));
             }
@@ -60,11 +46,9 @@ class Validator {
     chekIt(event){
         const target = event.target; 
        if(this.isValid(target)){ 
-        console.log(target);
            this.showSuccess(target); 
            this.error.delete(target);  
        }else{
-        console.log(target);
         this.showError(target);
         this.error.add(target);
        }
@@ -96,26 +80,30 @@ class Validator {
         const style = document.createElement('style');
         style.textContent = `
         input.success{
-            border: 2px solid green
+            border: 2px solid green !important;
         }
         input.error {
-            border: 2px solid red
+            border: 2px solid red !important;
         }
         .validator-error {
-            font-size: 12px;
+            font-size: 18px;
             font-family: sans-serif;
-            color: red
+            color: red;
         }
         `;
         document.head.appendChild(style);
     }
     setPattern(){
+        if(!this.pattern.name){
+            this.pattern.name = /^[A-zА-яЁё]{3,16}$/;
+        }
         if(!this.pattern.phone){
-            this.pattern.phone = /^\+?[78]([-()]*\d){10}$/;
-            // this.pattern.phone = /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/;
+            // this.pattern.phone = /^\+?[78]([-()]*\d){10}$/;
+            this.pattern.phone = /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/;
         }
         if(!this.pattern.email){
-            this.pattern.email = /^\w+@\w+\.\w{2,}/;
+            // this.pattern.email = /.+@.+\..+/i;
+            this.pattern.email = /^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i;
         }
     }  
 }
